@@ -1,0 +1,89 @@
+﻿@model DiyetisyenTakipOtomasyonu.Models.Doctors
+@{
+    ViewBag.Title = "Update";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+        $(document).ready(function () {
+            // Load provinces on page load
+            $.ajax({
+                url: "https://turkiyeapi.dev/api/v1/provinces",
+                method: "GET",
+                success: function (response) {
+                    console.log("Şehirler", response)
+                    var select = $('#Provinces');
+                    response.data.forEach(function (province) {
+                        var option = $('<option name="DoctorCity"></option>')
+                            .attr('value', province.id)
+                            .text(province.name);
+
+                        select.append(option);
+                    });
+                },
+                error: function () {
+                    alert('Şehirler yüklenirken bir hata oluştu.');
+                }
+            });
+
+            // Load districts when a province is selected
+            $('#Provinces').change(function () {
+                var provinceId = parseInt($(this).val());
+                console.log("Province ID ", provinceId)
+                console.log("Province ID type ", typeof (provinceId))
+                if (provinceId) {
+                    $.ajax({
+                        url: "https://turkiyeapi.dev/api/v1/provinces/" + provinceId,
+                        method: "GET",
+                        success: function (response) {
+                            console.log("ilçeler",response)
+                            var select = $('#Districts');
+                            select.empty();
+                            select.append('<option value="">İlçe seçin</option>');
+                            response.data.districts.forEach(function (district) {
+                                var option = $('<option name="DoctorDistrict"></option>')
+                                    .attr('value', district.id)
+                                    .text(district.name);
+                                select.append(option);
+                            });
+                        },
+                        error: function () {
+                            alert('İlçeler yüklenirken bir hata oluştu.');
+                        }
+                    });
+                } else {
+                    $('#Districts').empty();
+                    $('#Districts').append('<option value="">İlçe seçin</option>');
+                }
+            });
+        });
+</script>
+
+
+<form action="@Url.Action("Update","Doktorlar")" method="post" enctype="multipart/form-data">
+    <label for="DoctorName">İsim: </label>
+    <input type="text" name="DoctorName" value="@Model.DoctorName" class="form-control" />
+    <label for="DoctorSurname">Soyisim: </label>
+    <input type="text" name="DoctorSurname" value="@Model.DoctorSurname" class="form-control" />
+    <label for="DoctorEmail">Email: </label>
+    <input type="text" name="DoctorEmail" value="@Model.DoctorEmail" class="form-control" />
+    <label for="DoctorNumber">Telefon Numarası: </label>
+    <input type="text" name="DoctorNumber" value="@Model.DoctorNumber" class="form-control" />
+    <label for="PatientImage">Fotoğraf: </label>
+    <input type="file" name="DoctorPhoto" class="form-control" value="@Model.DoctorPhoto" />
+    <input type="text" name="DoctorID" class="d-none" value="@Model.DoctorID" />
+    <label for="Provinces">Şehir: </label>
+    <select id="Provinces" name="DoctorCity" class="form-control">
+        <option value="">Şehir seçin</option>
+    </select>
+
+    <label for="Districts">İlçe: </label>
+    <select id="Districts" name="DoctorDistrict" class="form-control">
+        <option value="">İlçe seçin</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Gönder</button>
+
+</form>
+
+

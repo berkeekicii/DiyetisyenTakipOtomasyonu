@@ -1,0 +1,19 @@
+﻿
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form action="@Url.Action("Create","Login")" method="post" enctype="multipart/form-data">
+    <label for="name">İsim: </label>
+    <input type="text" name="name" value="" class="form-control" />
+    <label for="surname">Soyisim: </label>
+    <input type="text" name="surname" value="" class="form-control" />
+    <label for="email">Email: </label>
+    <input type="text" name="email" value="" class="form-control" />
+    <label for="Password">Şifre: </label>
+    <input type="password" name="Password" value="" />
+    
+    <button type="submit" class="btn btn-primary">Gönder</button>
+
+</form>

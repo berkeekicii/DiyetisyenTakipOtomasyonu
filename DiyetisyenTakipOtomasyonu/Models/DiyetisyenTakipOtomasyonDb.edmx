@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="DiyetisyenTakipOtomasyonModel1.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
+          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Admin">
+          <Key>
+            <PropertyRef Name="UserID" />
+          </Key>
+          <Property Name="UserID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar(max)" />
+          <Property Name="Surname" Type="nvarchar(max)" />
+          <Property Name="Password" Type="nvarchar(max)" />
+          <Property Name="Email" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Diagnosis">
+          <Key>
+            <PropertyRef Name="DiagnosisID" />
+          </Key>
+          <Property Name="DiagnosisID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DoctorID" Type="int" />
+          <Property Name="PatientID" Type="int" />
+          <Property Name="DiagnosisValue" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Doctors">
+          <Key>
+            <PropertyRef Name="DoctorID" />
+          </Key>
+          <Property Name="DoctorID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DoctorName" Type="nvarchar(max)" />
+          <Property Name="DoctorSurname" Type="nvarchar(max)" />
+          <Property Name="DoctorEmail" Type="nvarchar(max)" />
+          <Property Name="DoctorNumber" Type="nvarchar(max)" />
+          <Property Name="DoctorPhoto" Type="nvarchar(max)" />
+          <Property Name="DoctorCity" Type="int" />
+          <Property Name="DoctorDistrict" Type="int" />
+        </EntityType>
+        <EntityType Name="Patient">
+          <Key>
+            <PropertyRef Name="PatientID" />
+          </Key>
+          <Property Name="PatientID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PatientName" Type="nvarchar(max)" />
+          <Property Name="PatientSurname" Type="nvarchar(max)" />
+          <Property Name="PatientEmail" Type="nvarchar(max)" />
+          <Property Name="PatientPhoneNumber" Type="nvarchar(max)" />
+          <Property Name="Weigth" Type="int" />
+          <Property Name="Heigth" Type="int" />
+          <Property Name="Endex" Type="int" />
+          <Property Name="Gender" Type="bit" />
+          <Property Name="PatientImage" Type="nvarchar(max)" />
+          <Property Name="DoctorID" Type="int" />
+          <Property Name="RandevuTarihi" Type="datetime" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <Association Name="FK_Diagnosis_Doctors">
+          <End Role="Doctors" Type="Self.Doctors" Multiplicity="0..1" />
+          <End Role="Diagnosis" Type="Self.Diagnosis" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctors">
+              <PropertyRef Name="DoctorID" />
+            </Principal>
+            <Dependent Role="Diagnosis">
+              <PropertyRef Name="DoctorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Diagnosis_Patient1">
+          <End Role="Patient" Type="Self.Patient" Multiplicity="0..1" />
+          <End Role="Diagnosis" Type="Self.Diagnosis" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="PatientID" />
+            </Principal>
+            <Dependent Role="Diagnosis">
+              <PropertyRef Name="PatientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="DiyetisyenTakipOtomasyonModel1StoreContainer">
+          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Admin" EntityType="Self.Admin" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Diagnosis" EntityType="Self.Diagnosis" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Doctors" EntityType="Self.Doctors" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Patient" EntityType="Self.Patient" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Diagnosis_Doctors" Association="Self.FK_Diagnosis_Doctors">
+            <End Role="Doctors" EntitySet="Doctors" />
+            <End Role="Diagnosis" EntitySet="Diagnosis" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Diagnosis_Patient1" Association="Self.FK_Diagnosis_Patient1">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="Diagnosis" EntitySet="Diagnosis" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="DiyetisyenTakipOtomasyonModel1" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="DiyetisyenTakipOtomasyonEntities2" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Diagnosis" EntityType="DiyetisyenTakipOtomasyonModel1.Diagnosis" />
+          <EntitySet Name="Doctors" EntityType="DiyetisyenTakipOtomasyonModel1.Doctors" />
+          <EntitySet Name="Patient" EntityType="DiyetisyenTakipOtomasyonModel1.Patient" />
+          <AssociationSet Name="FK_Diagnosis_Doctors" Association="DiyetisyenTakipOtomasyonModel1.FK_Diagnosis_Doctors">
+            <End Role="Doctors" EntitySet="Doctors" />
+            <End Role="Diagnosis" EntitySet="Diagnosis" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Diagnosis_Patient1" Association="DiyetisyenTakipOtomasyonModel1.FK_Diagnosis_Patient1">
+            <End Role="Patient" EntitySet="Patient" />
+            <End Role="Diagnosis" EntitySet="Diagnosis" />
+          </AssociationSet>
+          <EntitySet Name="Admin" EntityType="DiyetisyenTakipOtomasyonModel1.Admin" />
+        </EntityContainer>
+        <EntityType Name="Diagnosis">
+          <Key>
+            <PropertyRef Name="DiagnosisID" />
+          </Key>
+          <Property Name="DiagnosisID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DoctorID" Type="Int32" />
+          <Property Name="PatientID" Type="Int32" />
+          <Property Name="DiagnosisValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Doctors" Relationship="DiyetisyenTakipOtomasyonModel1.FK_Diagnosis_Doctors" FromRole="Diagnosis" ToRole="Doctors" />
+          <NavigationProperty Name="Patient" Relationship="DiyetisyenTakipOtomasyonModel1.FK_Diagnosis_Patient1" FromRole="Diagnosis" ToRole="Patient" />
+        </EntityType>
+        <EntityType Name="Doctors">
+          <Key>
+            <PropertyRef Name="DoctorID" />
+          </Key>
+          <Property Name="DoctorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DoctorName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DoctorSurname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DoctorEmail" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DoctorNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Diagnosis" Relationship="DiyetisyenTakipOtomasyonModel1.FK_Diagnosis_Doctors" FromRole="Doctors" ToRole="Diagnosis" />
+          <Property Name="DoctorPhoto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DoctorCity" Type="Int32" />
+          <Property Name="DoctorDistrict" Type="Int32" />
+        </EntityType>
+        <EntityType Name="Patient">
+          <Key>
+            <PropertyRef Name="PatientID" />
+          </Key>
+          <Property Name="PatientID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PatientName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PatientSurname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PatientEmail" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PatientPhoneNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Weigth" Type="Int32" />
+          <Property Name="Heigth" Type="Int32" />
+          <Property Name="Endex" Type="Int32" />
+          <Property Name="Gender" Type="Boolean" />
+          <Property Name="PatientImage" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DoctorID" Type="Int32" />
+          <NavigationProperty Name="Diagnosis" Relationship="DiyetisyenTakipOtomasyonModel1.FK_Diagnosis_Patient1" FromRole="Patient" ToRole="Diagnosis" />
+          <Property Name="RandevuTarihi" Type="DateTime" Precision="3" />
+        </EntityType>
+        <Association Name="FK_Diagnosis_Doctors">
+          <End Type="DiyetisyenTakipOtomasyonModel1.Doctors" Role="Doctors" Multiplicity="0..1" />
+          <End Type="DiyetisyenTakipOtomasyonModel1.Diagnosis" Role="Diagnosis" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Doctors">
+              <PropertyRef Name="DoctorID" />
+            </Principal>
+            <Dependent Role="Diagnosis">
+              <PropertyRef Name="DoctorID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Diagnosis_Patient1">
+          <End Type="DiyetisyenTakipOtomasyonModel1.Patient" Role="Patient" Multiplicity="0..1" />
+          <End Type="DiyetisyenTakipOtomasyonModel1.Diagnosis" Role="Diagnosis" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Patient">
+              <PropertyRef Name="PatientID" />
+            </Principal>
+            <Dependent Role="Diagnosis">
+              <PropertyRef Name="PatientID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Admin">
+          <Key>
+            <PropertyRef Name="UserID" />
+          </Key>
+          <Property Name="UserID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Surname" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="DiyetisyenTakipOtomasyonModel1StoreContainer" CdmEntityContainer="DiyetisyenTakipOtomasyonEntities2">
+          <EntitySetMapping Name="Diagnosis">
+            <EntityTypeMapping TypeName="DiyetisyenTakipOtomasyonModel1.Diagnosis">
+              <MappingFragment StoreEntitySet="Diagnosis">
+                <ScalarProperty Name="DiagnosisValue" ColumnName="DiagnosisValue" />
+                <ScalarProperty Name="PatientID" ColumnName="PatientID" />
+                <ScalarProperty Name="DoctorID" ColumnName="DoctorID" />
+                <ScalarProperty Name="DiagnosisID" ColumnName="DiagnosisID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Doctors">
+            <EntityTypeMapping TypeName="DiyetisyenTakipOtomasyonModel1.Doctors">
+              <MappingFragment StoreEntitySet="Doctors">
+                <ScalarProperty Name="DoctorDistrict" ColumnName="DoctorDistrict" />
+                <ScalarProperty Name="DoctorCity" ColumnName="DoctorCity" />
+                <ScalarProperty Name="DoctorPhoto" ColumnName="DoctorPhoto" />
+                <ScalarProperty Name="DoctorNumber" ColumnName="DoctorNumber" />
+                <ScalarProperty Name="DoctorEmail" ColumnName="DoctorEmail" />
+                <ScalarProperty Name="DoctorSurname" ColumnName="DoctorSurname" />
+                <ScalarProperty Name="DoctorName" ColumnName="DoctorName" />
+                <ScalarProperty Name="DoctorID" ColumnName="DoctorID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Patient">
+            <EntityTypeMapping TypeName="DiyetisyenTakipOtomasyonModel1.Patient">
+              <MappingFragment StoreEntitySet="Patient">
+                <ScalarProperty Name="RandevuTarihi" ColumnName="RandevuTarihi" />
+                <ScalarProperty Name="DoctorID" ColumnName="DoctorID" />
+                <ScalarProperty Name="PatientImage" ColumnName="PatientImage" />
+                <ScalarProperty Name="Gender" ColumnName="Gender" />
+                <ScalarProperty Name="Endex" ColumnName="Endex" />
+                <ScalarProperty Name="Heigth" ColumnName="Heigth" />
+                <ScalarProperty Name="Weigth" ColumnName="Weigth" />
+                <ScalarProperty Name="PatientPhoneNumber" ColumnName="PatientPhoneNumber" />
+                <ScalarProperty Name="PatientEmail" ColumnName="PatientEmail" />
+                <ScalarProperty Name="PatientSurname" ColumnName="PatientSurname" />
+                <ScalarProperty Name="PatientName" ColumnName="PatientName" />
+                <ScalarProperty Name="PatientID" ColumnName="PatientID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Admin">
+            <EntityTypeMapping TypeName="DiyetisyenTakipOtomasyonModel1.Admin">
+              <MappingFragment StoreEntitySet="Admin">
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Surname" ColumnName="Surname" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

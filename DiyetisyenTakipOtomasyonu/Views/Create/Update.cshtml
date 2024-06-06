@@ -1,0 +1,43 @@
+﻿@model DiyetisyenTakipOtomasyonu.Models.ViewModels.PatientDetailViewModel
+
+@{
+    ViewBag.Title = "Update";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form action="@Url.Action("Update","Create")" method="post" enctype="multipart/form-data">
+    <label for="name">İsim Soyisim: </label>
+    <input type="text" name="PatientNameSurname" value=@Model.PatientNameSurname class="form-control" />
+
+    <label for="email">Email: </label>
+    <input type="text" name="PatientEmail" value="@Model.PatientEmail" class="form-control" />
+    <label for="PatientPhoneNumber">Telefon Numarası: </label>
+    <input type="text" name="PatientPhoneNumber" value="@Model.PatientPhoneNumber" class="form-control" />
+    <label for="Weigth">Kilo: </label>
+    <input type="number" name="Weight" value="@Model.Weight" class="form-control" />
+    <label for="Heigth">Boy: </label>
+    <input type="number" name="Heigth" value="@Model.Heigth" class="form-control" />
+    <label for="Endex">Endex: </label>
+    <input type="number" name="Endex" value="@Model.Endex" class="form-control" />
+    <label for="Gender">Cinsiyet: </label>
+    <span>Erkek</span>
+    <input type="radio" name="Gender" value="Erkek" />
+    <span>Kadın</span>
+    <input type="radio" name="Gender" value="Kadın" />
+    <br />
+    <label for="PatientImage">Fotoğraf: </label>
+    <input type="file" name="PatientImage" class="form-control" />
+    <label for="Diagnostic">Hastanın sorunları veya teşhis: </label>
+    <input type="text" name="DiagnosisValue" class="form-control" value="@Model.DiagnosisValue" /><br />
+    <label for="DoctorID">Doktor Seçin: </label>
+    <select name="DoctorID">
+        @foreach (var item in ViewBag.doctorsUpdate)
+        {
+            <option value="@item.DoctorID">@item.DoctorName @item.DoctorSurname</option>
+        }
+    </select>
+    <br />
+    <input class="d-none" type="text" name="PatientID" value="@Model.PatientID" />
+    <button type="submit" class="btn btn-primary">Gönder</button>
+
+</form>

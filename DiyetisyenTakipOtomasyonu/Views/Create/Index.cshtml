@@ -1,0 +1,46 @@
+﻿@model List<DiyetisyenTakipOtomasyonu.Models.Doctors>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form action="@Url.Action("Create","Create")" method="post" enctype="multipart/form-data">
+    <label for="name">İsim: </label>
+    <input type="text" name="name" value="" class="form-control" />
+    <label for="surname">Soyisim: </label>
+    <input type="text" name="surname" value="" class="form-control" />
+    <label for="email">Email: </label>
+    <input type="text" name="email" value="" class="form-control" />
+    <label for="PatientPhoneNumber">Telefon Numarası: </label>
+    <input type="text" name="PatientPhoneNumber" value="" class="form-control" />
+    <label for="Weigth">Kilo: </label>
+    <input type="number" name="Weigth" value="" class="form-control" />
+    <label for="Heigth">Boy: </label>
+    <input type="number" name="Heigth" value="" class="form-control" />
+    <label for="Endex">Endex: </label>
+    <input type="number" name="Endex" value="" class="form-control" />
+    <label for="Gender">Cinsiyet: </label>
+    <span>Erkek</span>
+    <input type="radio" name="Gender" value="false" />
+    <span>Kadın</span>
+    <input type="radio" name="Gender" value="true" />
+    <br />
+    <label for="PatientImage">Fotoğraf: </label>
+    <input type="file" name="PatientImage" class="form-control" />
+    <label for="Diagnostic">Hastanın sorunları veya teşhis: </label>
+    <input type="text" name="Diagnostic" class="form-control" /><br />
+    <label for="DoctorID">Doktor Seçin: </label>
+    <select name="DoctorID">
+        @foreach (var item in Model)
+        {
+            <option value="@item.DoctorID">@item.DoctorName @item.DoctorSurname</option>
+        }
+    </select>
+    <label>Randevu Tarihi</label>
+    <input type="date" name="RandevuTarihi" class="form-control" /><br />
+
+    <br />
+    <button type="submit" class="btn btn-primary">Gönder</button>
+
+</form>
+

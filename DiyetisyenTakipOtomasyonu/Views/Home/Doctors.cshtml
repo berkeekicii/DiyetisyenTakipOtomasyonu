@@ -1,0 +1,175 @@
+﻿@model List<DiyetisyenTakipOtomasyonu.Models.Doctors>
+@{
+    ViewBag.Title = "Doctors";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    *, *:before, *:after {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Source Sans Pro', sans-serif;
+        margin: 0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        margin: 0;
+    }
+
+    .table {
+        width: 100%;
+        border: 1px solid #000; /* Örnek bir değer */
+    }
+
+    .table-header {
+        display: flex;
+        width: 100%;
+        background: #000;
+        padding: 10px 0; /* Örnek bir değer */
+    }
+
+    .table-row {
+        display: flex;
+        width: 100%;
+        padding: 10px 0; /* Örnek bir değer */
+    }
+
+        .table-row:nth-of-type(odd) {
+            background: #ccc; /* Örnek bir değer */
+        }
+
+    .table-data, .header__item {
+        flex: 1 1 20%;
+        text-align: center;
+    }
+
+    .header__item {
+        text-transform: uppercase;
+    }
+
+    .filter__link {
+        color: white;
+        text-decoration: none;
+        position: relative;
+        display: inline-block;
+        padding: 0 10px; /* Örnek bir değer */
+    }
+
+        .filter__link::after {
+            content: '';
+            position: absolute;
+            right: -10px; /* Örnek bir değer */
+            color: white;
+            font-size: 10px; /* Örnek bir değer */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .filter__link.desc::after {
+            content: '(desc)';
+        }
+
+        .filter__link.asc::after {
+            content: '(asc)';
+        }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+         var properties = [
+            'PatientName',
+            'PatientSurname',
+            'Heigth',
+            'Weigth',
+            'Endex'
+        ];
+
+        $.each(properties, function (i, val) {
+            var orderClass = '';
+
+            $("#" + val).click(function (e) {
+                e.preventDefault();
+                $('.filter__link.filter__link--active').not(this).removeClass('filter__link--active');
+                $(this).toggleClass('filter__link--active');
+                $('.filter__link').removeClass('asc desc');
+
+                if (orderClass == 'desc' || orderClass == '') {
+                    $(this).addClass('asc');
+                    orderClass = 'asc';
+                } else {
+                    $(this).addClass('desc');
+                    orderClass = 'desc';
+                }
+
+                var parent = $(this).closest('.header__item');
+                var index = $(".header__item").index(parent);
+                var $table = $('.table-content');
+                var rows = $table.find('.table-row').get();
+                var isSelected = $(this).hasClass('filter__link--active');
+                var isNumber = $(this).hasClass('filter__link--number');
+
+                rows.sort(function (a, b) {
+                    var x = $(a).find('.table-data').eq(index).text();
+                    var y = $(b).find('.table-data').eq(index).text();
+
+                    if (isNumber) {
+                        if (isSelected) {
+                            return x - y;
+                        } else {
+                            return y - x;
+                        }
+                    } else {
+                        if (isSelected) {
+                            return x.localeCompare(y);
+                        } else {
+                            return y.localeCompare(x);
+                        }
+                    }
+                });
+
+                $.each(rows, function (index, row) {
+                    $table.append(row);
+                });
+
+                return false;
+            });
+
+        });
+    });
+</script>
+
+
+
+<form action="@Url.Action("Index", "Home")" method="get">
+    <input type="text" id="searchQuery" name="searchQuery" placeholder="Search...">
+    <button class="btn" type="submit">Filtrele</button>
+    <button class="btn" type="submit">Temizle</button>
+</form>
+
+<div class="table">
+    <div class="table-header">
+        <div class="header__item"><a id="PatientName" class="filter__link" href="#">Name</a></div>
+        <div class="header__item"><a id="PatientSurname" class="filter__link" href="#">Surname</a></div>
+        <div class="header__item"><a id="Heigth" class="filter__link filter__link--number" href="#">Email</a></div>
+        <div class="header__item"><a id="Weigth" class="filter__link filter__link--number" href="#">Tel No</a></div>
+        <div class="header__item"><a id="Actions" class="filter__link filter__link--number" href="#">İşlemler</a></div>
+    </div>
+    <div class="table-content">
+        @foreach (var item in Model)
+        {
+            <div class="table-row">
+                <div class="table-data">@item.DoctorName </div>
+                <div class="table-data">@item.DoctorSurname</div>
+                <div class="table-data">@item.DoctorEmail</div>
+                <div class="table-data">@item.DoctorNumber</div>
+                <div class="table-data">
+                    <button class="btn btn-primary"><a href="@Url.Action("Index","Detail", new {id = item.DoctorID})" style="color: white">Detay</a></button>
+                    <button class="btn btn-danger"><a href="#" style="color: white">Kaydı Sil</a></button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
