@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace DiyetisyenTakipOtomasyonu.Controllers
 {
+    [AdminAuthorize]
     public class HomeController : Controller
     {
 
@@ -42,6 +43,8 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
             return View(doctors);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Remove(int id)
         {
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();

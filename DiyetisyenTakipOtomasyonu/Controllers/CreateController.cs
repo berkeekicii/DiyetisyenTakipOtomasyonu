@@ -9,6 +9,7 @@ using System.Web.Mvc;
 
 namespace DiyetisyenTakipOtomasyonu.Controllers
 {
+    [AdminAuthorize]
     public class CreateController : Controller
     {
         // GET: Create

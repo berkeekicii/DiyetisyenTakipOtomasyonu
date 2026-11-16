@@ -8,6 +8,7 @@ using System.Web.Mvc;
 
 namespace DiyetisyenTakipOtomasyonu.Controllers
 {
+    [AdminAuthorize]
     public class DetailController : Controller
     {
         // GET: Detail

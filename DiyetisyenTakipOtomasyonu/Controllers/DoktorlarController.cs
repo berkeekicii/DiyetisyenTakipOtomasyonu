@@ -12,6 +12,7 @@ using System.Web.Mvc;
 
 namespace DiyetisyenTakipOtomasyonu.Controllers
 {
+    [AdminAuthorize]
     public class DoktorlarController : Controller
     {
         // GET: Doktorlar
@@ -111,6 +112,8 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
             context.SaveChanges();
             return RedirectToAction("Index","Doktorlar");
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Remove(int id)
         {
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();
