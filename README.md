@@ -31,25 +31,20 @@ Requirements: Windows, Visual Studio 2019 or newer with the ASP.NET workload, an
 
 1. Clone the repository.
 2. In SQL Server Management Studio, restore the database: right-click *Databases → Import Data-tier Application* and choose `diyetisyenTakipOtomasyyonuDb.bacpac`. Name the database `DiyetisyenTakipOtomasyon`.
-3. Open `DiyetisyenTakipOtomasyonu.sln`. In `Web.config`, change `data source=BERKE` in the connection string `DiyetisyenTakipOtomasyonEntities2` to your own server name (for example `.\SQLEXPRESS` or `(localdb)\MSSQLLocalDB`).
+3. Open `DiyetisyenTakipOtomasyonu.sln`. Restore the database to LocalDB (`(localdb)\MSSQLLocalDB`). If you use another SQL Server instance, change `data source` in the connection string `DiyetisyenTakipOtomasyonEntities2` in `Web.config`.
 4. Restore the NuGet packages and press F5.
 
 Only `DiyetisyenTakipOtomasyonEntities2` is used by the code. The other connection strings in `Web.config` are leftovers from earlier models.
 
-## Recent fixes
+## Security and fixes
 
-- Uploaded images are now validated (jpg, jpeg, png, gif, webp only) and saved under a unique name, so files can no longer overwrite each other and non-image files are rejected.
+- **Login required:** every page except the login page is protected by a session-based `[AdminAuthorize]` filter. A logout link is in the navigation bar. New admin accounts can only be created by a logged-in admin (or when no admin exists yet).
+- **Hashed passwords:** passwords are stored with PBKDF2. Old plain-text rows from the sample database are accepted once and upgraded to a hash on the first successful login.
+- **Safe deletes:** delete actions are POST requests with an anti-forgery token and a confirmation dialog. A doctor who still has patients cannot be deleted; a message is shown instead.
+- **Safe uploads:** uploaded images are limited to jpg, jpeg, png, gif and webp and saved under a unique name, so files cannot overwrite each other and non-image files are rejected.
 - The doctor list no longer drops a doctor when the city/district API is slow or unreachable.
-- Detail and edit pages return "not found" instead of crashing for a missing record.
-- Editing a patient keeps multi-word names correct, updates the index value and works for patients that have no diagnosis row yet.
-- A doctor who still has patients can no longer be deleted (this used to fail with a foreign key error); a message is shown instead.
-
-These changes were made by reading the code, and I could not build or run the application where I edited it, so please do a quick build and test in Visual Studio.
-
-## Known limitations
-
-- Passwords are stored as plain text and the other pages do not check whether you are logged in. This is acceptable for a coursework demo but not for real use; it should be replaced with hashed passwords and authentication (for example ASP.NET Identity).
-- Delete actions are normal links (HTTP GET) without a confirmation or anti-forgery protection.
+- Detail and edit pages return "not found" instead of crashing for a missing record, and editing a patient handles multi-word names, updates the index value and works for patients without a diagnosis row.
+- The default connection string points to SQL Server LocalDB, so the project runs after restoring the database without editing `Web.config`.
 
 ## Author
 
