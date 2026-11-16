@@ -181,7 +181,7 @@
                     <div class="table-data">
                         <button class="btn btn-primary"><a href="@Url.Action("Detail","Doktorlar", new {id = item.DoctorID})" style="color: white">Detay</a></button>
                         <button class="btn btn-primary"><a href="@Url.Action("Update","Doktorlar", new {id = item.DoctorID})" style="color: white">Güncelle</a></button>
-                        <button class="btn btn-danger"><a href="@Url.Action("Remove","Doktorlar", new {id = item.DoctorID})" style="color: white">Kaydı Sil</a></button>
+                        <form method="post" action="@Url.Action("Remove","Doktorlar", new {id = item.DoctorID})" style="display:inline" onsubmit="return confirm('Bu kaydı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.');">@Html.AntiForgeryToken()<button type="submit" class="btn btn-danger">Kaydı Sil</button></form>
                     </div>
                 </div>
             }
