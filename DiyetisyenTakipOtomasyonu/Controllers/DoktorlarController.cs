@@ -35,51 +35,43 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
 
 
             List<DoctorDetailViewModel> doktorlarDetail = new List<DoctorDetailViewModel>();
-            foreach (var item in doktorlar)
+            using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(10) })
             {
-
-
-                
-
-                string cityUrl = $"https://turkiyeapi.dev/api/v1/provinces/{item.DoctorCity}";
-                string districtUrl = $"https://turkiyeapi.dev/api/v1/districts/{item.DoctorDistrict}";
-                using (HttpClient client = new HttpClient())
+                foreach (var item in doktorlar)
                 {
-                    HttpResponseMessage responseCity = await client.GetAsync(cityUrl);
-                    HttpResponseMessage responseDistrict = await client.GetAsync(districtUrl);
-                    if (responseCity.IsSuccessStatusCode && responseDistrict.IsSuccessStatusCode)
+                    // Fall back to the stored codes if the city/district lookup fails,
+                    // so a doctor never disappears from the list because of the API.
+                    string provinceName = item.DoctorCity;
+                    string districtName = item.DoctorDistrict;
+                    try
                     {
-                        string provinceDetails = await responseCity.Content.ReadAsStringAsync();
-                        string districtDetails = await responseDistrict.Content.ReadAsStringAsync();
-
-                        dynamic responseObjectCity = JsonConvert.DeserializeObject(provinceDetails);
-                        dynamic responseObjectDistrict = JsonConvert.DeserializeObject(districtDetails);
-
-                        string provinceName = responseObjectCity.data.name;
-                        string districtName = responseObjectDistrict.data.name;
-
-
-                        ViewBag.ProvinceDetails = provinceName;
-                        ViewBag.DistrictDetails = districtName;
-                        doktorlarDetail.Add(new DoctorDetailViewModel
+                        var responseCity = await client.GetAsync($"https://turkiyeapi.dev/api/v1/provinces/{item.DoctorCity}");
+                        var responseDistrict = await client.GetAsync($"https://turkiyeapi.dev/api/v1/districts/{item.DoctorDistrict}");
+                        if (responseCity.IsSuccessStatusCode && responseDistrict.IsSuccessStatusCode)
                         {
-                            DoctorID = item.DoctorID,
-                            DoctorCity = provinceName,
-                            DoctorDistrict = districtName,
-                            DoctorSurname = item.DoctorSurname,
-                            DoctorEmail = item.DoctorEmail,
-                            DoctorName = item.DoctorName,
-                            DoctorNumber = item.DoctorNumber,
-                            DoctorPhoto = item.DoctorPhoto,
-
-                        });
+                            dynamic city = JsonConvert.DeserializeObject(await responseCity.Content.ReadAsStringAsync());
+                            dynamic district = JsonConvert.DeserializeObject(await responseDistrict.Content.ReadAsStringAsync());
+                            provinceName = city.data.name;
+                            districtName = district.data.name;
+                        }
                     }
-                    else
+                    catch (Exception)
                     {
-                        ViewBag.ProvinceDetails = "Error fetching province details";
+                        // keep the fallback values
                     }
+
+                    doktorlarDetail.Add(new DoctorDetailViewModel
+                    {
+                        DoctorID = item.DoctorID,
+                        DoctorCity = provinceName,
+                        DoctorDistrict = districtName,
+                        DoctorSurname = item.DoctorSurname,
+                        DoctorEmail = item.DoctorEmail,
+                        DoctorName = item.DoctorName,
+                        DoctorNumber = item.DoctorNumber,
+                        DoctorPhoto = item.DoctorPhoto,
+                    });
                 }
-                
             }
             if (doktorlarDetail.Count() == 0)
             {
@@ -111,20 +103,8 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
 
             if (DoctorPhoto != null && DoctorPhoto.ContentLength > 0)
             {
-                var uploadDir = "~/Uploads";
-                var physicalUploadDir = Server.MapPath(uploadDir);
-
-                if (!Directory.Exists(physicalUploadDir))
-                {
-                    Directory.CreateDirectory(physicalUploadDir);
-                }
-
-                var fileName = Path.GetFileName(DoctorPhoto.FileName);
-                var path = Path.Combine(physicalUploadDir, fileName);
-
-                DoctorPhoto.SaveAs(path);
-
-                doctors.DoctorPhoto = fileName;
+                var savedName = UploadHelper.Save(DoctorPhoto, Server);
+                if (savedName != null) doctors.DoctorPhoto = savedName;
             }
 
             context.Doctors.Add(doctors);
@@ -140,6 +120,13 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
             if (doctor == null)
             {
                 return HttpNotFound();
+            }
+
+            // A doctor who still has patients cannot be deleted (foreign key).
+            if (entities.Patient.Any(p => p.DoctorID == id))
+            {
+                TempData["Error"] = "Bu doktora bağlı hastalar var. Önce hastaları başka bir doktora atayın.";
+                return RedirectToAction("Index", "Doktorlar");
             }
 
             foreach (var diagnosis in doctor.Diagnosis.ToList())
@@ -159,6 +146,7 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();
 
             var selectedDoktor = entities.Doctors.Where(x => x.DoctorID == id).FirstOrDefault();
+            if (selectedDoktor == null) return HttpNotFound();
 
             string cityUrl = $"https://turkiyeapi.dev/api/v1/provinces/{selectedDoktor.DoctorCity}";
             string districtUrl = $"https://turkiyeapi.dev/api/v1/districts/{selectedDoktor.DoctorDistrict}";
@@ -197,6 +185,7 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();
 
             var selectedDoktor = entities.Doctors.Where(x => x.DoctorID == id).FirstOrDefault();
+            if (selectedDoktor == null) return HttpNotFound();
             return View(selectedDoktor);
         }
         [HttpPost]
@@ -205,6 +194,7 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();
 
             var selectedDoktor = entities.Doctors.Where(x => x.DoctorID == doc.DoctorID).FirstOrDefault();
+            if (selectedDoktor == null) return HttpNotFound();
 
 
             selectedDoktor.DoctorEmail = doc.DoctorEmail;
@@ -215,24 +205,36 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
             selectedDoktor.DoctorDistrict = doc.DoctorDistrict;
             if (DoctorPhoto != null && DoctorPhoto.ContentLength > 0)
             {
-                var uploadDir = "~/Uploads";
-                var physicalUploadDir = Server.MapPath(uploadDir);
-
-                if (!Directory.Exists(physicalUploadDir))
-                {
-                    Directory.CreateDirectory(physicalUploadDir);
-                }
-
-                var fileName = Path.GetFileName(DoctorPhoto.FileName);
-                var path = Path.Combine(physicalUploadDir, fileName);
-
-                DoctorPhoto.SaveAs(path);
-
-                selectedDoktor.DoctorPhoto = fileName;
+                var savedName = UploadHelper.Save(DoctorPhoto, Server);
+                if (savedName != null) selectedDoktor.DoctorPhoto = savedName;
             }
 
             entities.SaveChanges();
             return RedirectToAction("Index","Doktorlar");
+        }
+    }
+}
+
+namespace DiyetisyenTakipOtomasyonu.Controllers
+{
+    /// <summary>Saves uploaded images safely (extension whitelist, unique file name).</summary>
+    public static class UploadHelper
+    {
+        private static readonly string[] Allowed = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
+        public static string Save(HttpPostedFileBase file, HttpServerUtilityBase server)
+        {
+            if (file == null || file.ContentLength <= 0) return null;
+
+            var ext = Path.GetExtension(file.FileName ?? "").ToLowerInvariant();
+            if (Array.IndexOf(Allowed, ext) < 0) return null;
+
+            var dir = server.MapPath("~/Uploads");
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+            var name = Guid.NewGuid().ToString("N") + ext;
+            file.SaveAs(Path.Combine(dir, name));
+            return name;
         }
     }
 }

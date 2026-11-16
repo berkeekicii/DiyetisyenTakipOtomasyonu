@@ -24,24 +24,8 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
         {
             if (PatientImage != null && PatientImage.ContentLength > 0)
             {
-                // Ensure the Uploads directory exists
-                var uploadDir = "~/Uploads";
-                var physicalUploadDir = Server.MapPath(uploadDir);
-
-                if (!Directory.Exists(physicalUploadDir))
-                {
-                    Directory.CreateDirectory(physicalUploadDir);
-                }
-
-                // Generate a unique filename
-                var fileName = Path.GetFileName(PatientImage.FileName);
-                var path = Path.Combine(physicalUploadDir, fileName);
-
-                // Save the file to the server
-                PatientImage.SaveAs(path);
-
-                // Save the file path or name to the database
-                patient.PatientImage = fileName;
+                var savedName = UploadHelper.Save(PatientImage, Server);
+                if (savedName != null) patient.PatientImage = savedName;
             }
 
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();
@@ -102,6 +86,7 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
                                Weight = (int)pt.Weigth,
                                DiagnosisValue = dg.DiagnosisValue,
                            }).FirstOrDefault(); 
+            if (selected == null) return HttpNotFound();
             return View(selected);
         }
 
@@ -110,11 +95,21 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
         {
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();
             var selected = entities.Patient.Where(x => x.PatientID == patient.PatientID).FirstOrDefault();
+            if (selected == null) return HttpNotFound();
 
             selected.Weigth = patient.Weight;
             selected.PatientPhoneNumber = patient.PatientPhoneNumber;
-            selected.PatientSurname = patient.PatientNameSurname.Split(' ').Last();
-            selected.PatientName = patient.PatientNameSurname.Split(' ').First();
+            var nameParts = (patient.PatientNameSurname ?? "").Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (nameParts.Length > 1)
+            {
+                selected.PatientSurname = nameParts.Last();
+                selected.PatientName = string.Join(" ", nameParts.Take(nameParts.Length - 1));
+            }
+            else if (nameParts.Length == 1)
+            {
+                selected.PatientName = nameParts[0];
+            }
+            selected.Endex = patient.Endex;
             selected.PatientEmail = patient.PatientEmail;
             selected.DoctorID = patient.DoctorID;
             selected.Gender = (patient.Gender == "Erkek" ? false : true);
@@ -122,24 +117,17 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
 
             if (PatientImage != null && PatientImage.ContentLength > 0)
             {
-                var uploadDir = "~/Uploads";
-                var physicalUploadDir = Server.MapPath(uploadDir);
-
-                if (!Directory.Exists(physicalUploadDir))
-                {
-                    Directory.CreateDirectory(physicalUploadDir);
-                }
-
-                var fileName = Path.GetFileName(PatientImage.FileName);
-                var path = Path.Combine(physicalUploadDir, fileName);
-
-                PatientImage.SaveAs(path);
-
-                selected.PatientImage = fileName;
+                var savedName = UploadHelper.Save(PatientImage, Server);
+                if (savedName != null) selected.PatientImage = savedName;
             }
 
 
             var diagnosis = entities.Diagnosis.FirstOrDefault(x => x.PatientID == selected.PatientID);
+            if (diagnosis == null)
+            {
+                diagnosis = new Diagnosis { PatientID = selected.PatientID };
+                entities.Diagnosis.Add(diagnosis);
+            }
             diagnosis.DiagnosisValue = patient.DiagnosisValue;
             diagnosis.DoctorID = selected.DoctorID;
 

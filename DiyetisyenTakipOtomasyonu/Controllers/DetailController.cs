@@ -34,12 +34,14 @@ namespace DiyetisyenTakipOtomasyonu.Controllers
                                DiagnosisValue = dg.DiagnosisValue,
                                RandevuTarihi = pt.RandevuTarihi
                            }).FirstOrDefault();
+            if (patient == null) return HttpNotFound();
             return View(patient);
         }
         public ActionResult DoctorDetail(int id)
         {
             DiyetisyenTakipOtomasyonEntities2 entities = new DiyetisyenTakipOtomasyonEntities2();
             var doctor =  entities.Doctors.FirstOrDefault(x => x.DoctorID == id);
+            if (doctor == null) return HttpNotFound();
             return View(doctor);
         }
     }
