@@ -146,7 +146,11 @@
     <div class="container">
         <div class="wrapper">
             <div class="title"><span>Login Form</span></div>
-            <form action="Login/Index" method="post">
+            <form action="@Url.Action("Index", "Login")" method="post">
+                @if (ViewBag.Error != null)
+                {
+                    <div style="color:#c0392b;margin-bottom:10px">@ViewBag.Error</div>
+                }
                 <div class="row">
                     <i class="fas fa-user"></i>
                     <input type="text" placeholder="Email or Phone" name="Email" required>
